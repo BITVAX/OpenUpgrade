@@ -190,7 +190,12 @@ def calculate_product_product_combination_indices(env):
         ) grouped_pvc
         WHERE grouped_pvc.product_product_id = pp.id""",
     )
-
+    openupgrade.logged_query(
+        env.cr, """
+        UPDATE product_product
+        SET combination_indices = CONCAT(combination_indices, ',XXX')
+        where id in (select max(id) from product_product group by combination_indices having count(*) > 1)""",
+    )
 
 def create_and_fill_product_variant_combination(env):
     if not openupgrade.table_exists(env.cr, "product_variant_combination"):
